@@ -10,7 +10,7 @@
 #include <string.h>
 #include <time.h>
 
-#define INPUT_DIMENSIONS 768
+#define INPUT_DIMENSIONS 784
 #define LAYER1_UNITS 128
 #define LAYER2_UNITS 10
 
@@ -33,6 +33,8 @@ int main(void){
     test3[1] = 10;
     test3[2] = -1;
     test3[3] = 3.1;
-    printf("%lf\n", MeanSquareError(4, test2, test3));
+    //double** layer1 = LoadLayerByParams(INPUT_DIMENSIONS, LAYER1_UNITS, "backups/layer1.params");
+    //ShowMatrix(INPUT_DIMENSIONS, LAYER1_UNITS, layer1);
+    WriteVectorToRecords(4, test3, "backups/loss.records");
     return 0;
 }

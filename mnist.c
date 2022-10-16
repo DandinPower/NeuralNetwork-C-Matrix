@@ -18,9 +18,9 @@
 
 #define TRAIN_DATA_SIZE 60000
 #define CLASS_NUMS 10
-#define BATCH_SIZE 256
+#define BATCH_SIZE 128
 #define LEARNING_RATE 0.001
-#define EPOCHS_NUMS 1000
+#define EPOCHS_NUMS 10001
 
 #define IMAGE_NORMALIZE 255
 
@@ -126,6 +126,18 @@ double** ForwardBackwardPass(double **x, double **y){
     return out;
 }
 
+//Mnist的forward passing
+double** ForwardPassOnly(double **x, double **y){
+    double** xLayer1 = MultiplyMatrix(BATCH_SIZE, INPUT_DIMENSIONS, LAYER1_UNITS, x, layer_1);
+    double** xSigmoid = sigmoid(BATCH_SIZE, LAYER1_UNITS, xLayer1);
+    double** xLayer2 = MultiplyMatrix(BATCH_SIZE, LAYER1_UNITS, LAYER2_UNITS, xSigmoid, layer_2);
+    double** out = softmax(BATCH_SIZE, LAYER2_UNITS, xLayer2);
+    FreeMatrix(xLayer1);
+    FreeMatrix(xSigmoid);
+    FreeMatrix(xLayer2);
+    return out;
+}
+
 //單個epoch的訓練流程
 void Training(int epoch, double** xTrain, double** yTrain, double* yVector){
     int* order = GetShuffleOrder(TRAIN_DATA_SIZE); 
@@ -147,7 +159,8 @@ void Training(int epoch, double** xTrain, double** yTrain, double* yVector){
     free(order);
 }
 
-int main(void){
+//訓練參數
+void Train(){
     srand(time(NULL));
     layer_1 = InitWeightMatrix(INPUT_DIMENSIONS, LAYER1_UNITS);
     layer_2 = InitWeightMatrix(LAYER1_UNITS, LAYER2_UNITS);
@@ -157,6 +170,10 @@ int main(void){
     losses = AllocateNewVector(EPOCHS_NUMS);
     accuracies = AllocateNewVector(EPOCHS_NUMS);
     for (int i=0; i<EPOCHS_NUMS; i++) Training(i, xTrain, yTrain, yVector);
+    WriteLayerToParams(INPUT_DIMENSIONS, LAYER1_UNITS, layer_1, "backups/layer1.params");
+    WriteLayerToParams(LAYER1_UNITS, LAYER2_UNITS, layer_2, "backups/layer2.params");
+    WriteVectorToRecords(EPOCHS_NUMS, accuracies, "backups/accuracy.records");
+    WriteVectorToRecords(EPOCHS_NUMS, losses, "backups/loss.records");
     FreeMatrix(yTrain);
     FreeMatrix(xTrain);
     FreeMatrix(layer_1);
@@ -166,5 +183,34 @@ int main(void){
     FreeVector(yVector);
     FreeVector(losses);
     FreeVector(accuracies);
+}
+
+//讀參數近來後進行inference
+void Inference(){
+    layer_1 = LoadLayerByParams(INPUT_DIMENSIONS, LAYER1_UNITS, "backups/layer1.params");
+    layer_2 = LoadLayerByParams(LAYER1_UNITS, LAYER2_UNITS, "backups/layer2.params");
+    double** yTrain = ReadMnistLabel();
+    double** xTrain = ReadMnistImage();
+    double* yVector = TransferOnehotMatrixToVector(TRAIN_DATA_SIZE, CLASS_NUMS, yTrain);
+    double** out;
+    double* category;
+    out = ForwardPassOnly(xTrain, yTrain);
+    category = Argmax(BATCH_SIZE, LAYER2_UNITS, out, 1);
+    double accuracy = CountVectorDifferenceMean(BATCH_SIZE, category, yVector);
+    double loss= MeanSquareError(BATCH_SIZE, category, yVector);
+    printf("test accuracy: %lf, loss: %lf\n", accuracy, loss);
+    FreeMatrix(out);
+    FreeVector(category);
+    FreeMatrix(yTrain);
+    FreeMatrix(xTrain);
+    FreeMatrix(layer_1);
+    FreeMatrix(layer_2);
+    FreeVector(yVector);
+}
+
+
+int main(void){
+    Train();
+    //Inference();
     return 0;
 }

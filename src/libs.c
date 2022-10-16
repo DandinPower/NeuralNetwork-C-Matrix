@@ -8,6 +8,8 @@
 #include <string.h>
 #include <time.h>
 
+#define PARAMS_N 5000
+
 //隨機產生-1~1的weight
 double GenerateRandomValue(int x, int y, int max, int min) { 
     return ((double)rand()*(max-min) / RAND_MAX + min)/sqrt(x*y);
@@ -57,4 +59,58 @@ double* Argmax(int x, int y, double** matrix, int axis){
 //比較double的值 1為相等0為不相等
 int CompareDouble(double x, double y){
     return fabs(x - y) <= 1e-20;
+}
+
+//將Vector的結果寫成檔案
+void WriteVectorToRecords(int x, double *vector, char* path){
+    FILE *fp;
+    if ( (fp = fopen(path, "w")) == NULL ) {
+        puts("ERROR:Fail to open file!\n");
+        exit(0);
+    }
+    for (int i=0; i<x; i++) fprintf(fp, "%lf\n", vector[i]);
+    fclose(fp);
+}
+
+//將參數的結果寫成檔案
+void WriteLayerToParams(int x, int y, double **matrix, char* path){
+    FILE *fp;
+    if ( (fp = fopen(path, "w")) == NULL ) {
+        puts("ERROR:Fail to open file!\n");
+        exit(0);
+    }
+    for (int i=0; i<x; i++) {
+        for (int j=0; j<y; j++) fprintf(fp, "%lf,", matrix[i][j]);
+        fprintf(fp, "%s", "\n");
+    }
+    fclose(fp);
+}
+
+//將參數的值讀近來
+double ** LoadLayerByParams(int x, int y, char* path){
+    double** layer = AllocateNewMatrix(x, y);
+    FILE *fp;
+    char str[PARAMS_N + 1];
+    if ( (fp = fopen(path, "rt")) == NULL ) {
+        puts("Fail to open file!");
+        exit(0);
+    }
+    int i = 0;
+    int j = 0;
+    while( fgets(str, PARAMS_N, fp) != NULL ) {
+        const char* d = ",";
+        char *p;
+        p = strtok(str, d);
+        j = 0;
+        while (p != NULL) {
+            if (j == y) break;
+            sscanf(p, "%lf", &layer[i][j]);
+            p = strtok(NULL, d);		   
+            j++;
+        }
+        i++;
+    }
+    printf("Layer Rows: %d, Layer Columns: %d\n", i, j);
+    fclose(fp);
+    return layer;
 }

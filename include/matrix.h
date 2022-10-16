@@ -26,7 +26,7 @@ double* SumMatrix(int x, int y, double **matrix, int axis);
 double** CopyMatrix(int x, int y, double **matrix);
 
 //將矩陣每一個值都加上一個純量
-void** AddMatrixValue(int x, int y, double **matrix, int value);
+void AddMatrixValue(int x, int y, double **matrix, int value);
 //將矩陣對應的值做相加
 double** AddMatrix(int x, int y, double **matrix1, double ** matrix2);
 
@@ -34,7 +34,7 @@ double** AddMatrix(int x, int y, double **matrix1, double ** matrix2);
 double** SubMatrix(int x, int y, double **matrix1, double ** matrix2);
 
 //將矩陣每一個值都乘上一個純量
-void** MulMatrixValue(int x, int y, double **matrix, int value);
+void MulMatrixValue(int x, int y, double **matrix, int value);
 
 //將矩陣對應的值做相乘
 double** HadamardProductMatrix(int x, int y, double **matrix1, double ** matrix2);
@@ -43,7 +43,7 @@ double** HadamardProductMatrix(int x, int y, double **matrix1, double ** matrix2
 double** MultiplyMatrix(int x, int y, int z, double **matrix1, double ** matrix2);
 
 //將矩陣每一個值都除上一個純量
-void** DivMatrixValue(int x, int y, double **matrix, int value);
+void DivMatrixValue(int x, int y, double **matrix, int value);
 
 //將矩陣對應的值做相除
 double** DivMatrix(int x, int y, double **matrix1, double ** matrix2);

@@ -211,6 +211,6 @@ void Inference(){
 
 int main(void){
     //Train();
-    //Inference();
+    Inference();
     return 0;
 }

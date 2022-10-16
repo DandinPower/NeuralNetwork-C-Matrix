@@ -83,7 +83,7 @@ double** CopyMatrix(int x, int y, double **matrix){
 }
 
 //將矩陣每一個值都加上一個純量
-void** AddMatrixValue(int x, int y, double **matrix, int value){
+void AddMatrixValue(int x, int y, double **matrix, int value){
     for(int i=0; i<x; i++) for(int j=0; j<y; j++) matrix[i][j] += value;
 }
 
@@ -102,7 +102,7 @@ double** SubMatrix(int x, int y, double **matrix1, double ** matrix2){
 }
 
 //將矩陣每一個值都乘上一個純量
-void** MulMatrixValue(int x, int y, double **matrix, int value){
+void MulMatrixValue(int x, int y, double **matrix, int value){
     for(int i=0; i<x; i++) for(int j=0; j<y; j++) matrix[i][j] *= value;
 }
 
@@ -127,7 +127,7 @@ double** MultiplyMatrix(int x, int y, int z, double **matrix1, double ** matrix2
 }
 
 //將矩陣每一個值都除上一個純量
-void** DivMatrixValue(int x, int y, double **matrix, int value){
+void DivMatrixValue(int x, int y, double **matrix, int value){
     for(int i=0; i<x; i++) for(int j=0; j<y; j++) matrix[i][j] /= value;
 }
 

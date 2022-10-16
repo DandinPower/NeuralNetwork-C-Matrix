@@ -1,4 +1,6 @@
 #include "../include/libs.h"
+#include "../include/matrix.h"
+#include "../include/vector.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,4 +24,37 @@ int* GetShuffleOrder(int sliceNums){
         newOrder[j] = t;
     }
     return newOrder;
+}
+
+//計算axis維度的最大值 && 目前僅實作axis = 1
+double* Argmax(int x, int y, double** matrix, int axis){
+    double* result;
+    if (axis == 0){
+        printf("ERROR:axis == 0\n");
+        result = NULL;
+    }
+    else if (axis == 1){
+        result = AllocateNewVector(x);
+        for (int i=0; i<x; i++){
+            double tempMax = matrix[i][0];
+            double tempIndex = 0;
+            for (int j=0; j<y; j++){
+                if (matrix[i][j] >= tempMax){
+                    tempIndex = j;
+                    tempMax = matrix[i][j];
+                }
+            }
+            result[i] = tempIndex;
+        }
+    }
+    else {
+        printf("ERROR:axis != 1\n");
+        result = NULL;
+    }
+    return result;
+}
+
+//比較double的值 1為相等0為不相等
+int CompareDouble(double x, double y){
+    return fabs(x - y) <= 1e-20;
 }

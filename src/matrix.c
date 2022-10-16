@@ -154,3 +154,23 @@ double** GetSliceMatrixByOrder(int x, int y, double **matrix, int sliceNums, int
     }
     return sliceMatrix;
 }
+
+//將one hot encoding的matrix轉成vector
+double* TransferOnehotMatrixToVector(int x, int y, double** matrix){
+    double* result = AllocateNewVector(x);
+    for (int i=0; i<x; i++){
+        result[i] = -1;
+        for (int j=0; j<y; j++) if(CompareDouble(1.0f, matrix[i][j])) result[i] = j; 
+        if (CompareDouble(-1, result[i])) {
+            printf("ERROR:not find 1!\n");
+            result = NULL;
+            break;
+        }
+    }
+    return result;
+}
+
+//根據gradient跟learning rate進行更新
+void UpdateLayerByGradient(int x, int y, double **weight, double **gradient, double lr){
+    for (int i=0; i<x; i++) for (int j=0; j<y; j++) weight[i][j] -= (lr * gradient[i][j]);
+}

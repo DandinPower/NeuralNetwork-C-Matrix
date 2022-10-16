@@ -2,6 +2,7 @@
 #include "include/libs.h"
 #include "include/activation.h"
 #include "include/vector.h"
+#include "include/loss.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -18,6 +19,8 @@
 #define TRAIN_DATA_SIZE 60000
 #define CLASS_NUMS 10
 #define BATCH_SIZE 256
+#define LEARNING_RATE 0.001
+#define EPOCHS_NUMS 1000
 
 #define IMAGE_NORMALIZE 255
 
@@ -25,6 +28,8 @@ double** layer_1;
 double** layer_2;
 double** updateLayer1;
 double** updateLayer2;
+double* losses;
+double* accuracies;
 
 
 //讀取資料集的Y
@@ -121,19 +126,45 @@ double** ForwardBackwardPass(double **x, double **y){
     return out;
 }
 
+//單個epoch的訓練流程
+void Training(int epoch, double** xTrain, double** yTrain, double* yVector){
+    int* order = GetShuffleOrder(TRAIN_DATA_SIZE); 
+    double* yVectorSlice = GetSliceVectorByOrder(TRAIN_DATA_SIZE, yVector, BATCH_SIZE, order);
+    double** yTrainSlice = GetSliceMatrixByOrder(TRAIN_DATA_SIZE, CLASS_NUMS, yTrain, BATCH_SIZE, order);
+    double** xTrainSlice = GetSliceMatrixByOrder(TRAIN_DATA_SIZE, INPUT_DIMENSIONS, xTrain, BATCH_SIZE, order);
+    double** out = ForwardBackwardPass(xTrainSlice, yTrainSlice);
+    double* category = Argmax(BATCH_SIZE, LAYER2_UNITS, out, 1);
+    accuracies[epoch] = CountVectorDifferenceMean(BATCH_SIZE, category, yVectorSlice);
+    losses[epoch] = MeanSquareError(BATCH_SIZE, category, yVectorSlice);
+    UpdateLayerByGradient(INPUT_DIMENSIONS, LAYER1_UNITS, layer_1, updateLayer1, LEARNING_RATE);
+    UpdateLayerByGradient(LAYER1_UNITS, LAYER2_UNITS, layer_2, updateLayer2, LEARNING_RATE);
+    if(epoch % 500 == 0) printf("For %dth epoch: train accuracy: %lf\n", epoch, accuracies[epoch]);
+    FreeMatrix(yTrainSlice);
+    FreeMatrix(xTrainSlice);
+    FreeMatrix(out);
+    FreeVector(yVectorSlice);
+    FreeVector(category);
+    free(order);
+}
+
 int main(void){
     srand(time(NULL));
     layer_1 = InitWeightMatrix(INPUT_DIMENSIONS, LAYER1_UNITS);
     layer_2 = InitWeightMatrix(LAYER1_UNITS, LAYER2_UNITS);
     double** yTrain = ReadMnistLabel();
     double** xTrain = ReadMnistImage();
-    //DivMatrixValue(TRAIN_DATA_SIZE, INPUT_DIMENSIONS, xTrain, IMAGE_NORMALIZE);
-    int* order = GetShuffleOrder(TRAIN_DATA_SIZE); 
-    double** yTrainSlice = GetSliceMatrixByOrder(TRAIN_DATA_SIZE, CLASS_NUMS, yTrain, BATCH_SIZE, order);
-    double** xTrainSlice = GetSliceMatrixByOrder(TRAIN_DATA_SIZE, INPUT_DIMENSIONS, xTrain, BATCH_SIZE, order);
-    free(order);
-    double** out = ForwardBackwardPass(xTrainSlice, yTrainSlice);
-    FreeMatrix(yTrainSlice);
-    FreeMatrix(xTrainSlice);
+    double* yVector = TransferOnehotMatrixToVector(TRAIN_DATA_SIZE, CLASS_NUMS, yTrain);
+    losses = AllocateNewVector(EPOCHS_NUMS);
+    accuracies = AllocateNewVector(EPOCHS_NUMS);
+    for (int i=0; i<EPOCHS_NUMS; i++) Training(i, xTrain, yTrain, yVector);
+    FreeMatrix(yTrain);
+    FreeMatrix(xTrain);
+    FreeMatrix(layer_1);
+    FreeMatrix(layer_2);
+    FreeMatrix(updateLayer1);
+    FreeMatrix(updateLayer2);
+    FreeVector(yVector);
+    FreeVector(losses);
+    FreeVector(accuracies);
     return 0;
 }

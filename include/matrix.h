@@ -52,4 +52,10 @@ double** DivMatrix(int x, int y, double **matrix1, double ** matrix2);
 double** TransposeMatrix(int x, int y, double** matrix);
 //取得隨機長度為sliceNums的Maxtrix
 double** GetSliceMatrixByOrder(int x, int y, double **matrix, int sliceNums, int *order);
+
+//將one hot encoding的matrix轉成vector
+double* TransferOnehotMatrixToVector(int x, int y, double** matrix);
+
+//根據gradient跟learning rate進行更新
+void UpdateLayerByGradient(int x, int y, double **weight, double **gradient, double lr);
 #endif

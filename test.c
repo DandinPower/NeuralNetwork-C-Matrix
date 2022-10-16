@@ -2,6 +2,7 @@
 #include "include/libs.h"
 #include "include/activation.h"
 #include "include/vector.h"
+#include "include/loss.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,8 +23,16 @@ int main(void){
     test[1][0] = 3.1;
     test[1][1] = 1;
     test[1][2] = -3.11;
-    double** t = TransposeMatrix(2,3,test);
-    ShowMatrix(3,2,t);
-
+    double* test2 = AllocateNewVector(4);
+    test2[0] = 6;
+    test2[1] = 12;
+    test2[2] = -1;
+    test2[3] = 3;
+    double* test3 = AllocateNewVector(4);
+    test3[0] = 6;
+    test3[1] = 10;
+    test3[2] = -1;
+    test3[3] = 3.1;
+    printf("%lf\n", MeanSquareError(4, test2, test3));
     return 0;
 }

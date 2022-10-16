@@ -30,6 +30,9 @@ void** AddMatrixValue(int x, int y, double **matrix, int value);
 //將矩陣對應的值做相加
 double** AddMatrix(int x, int y, double **matrix1, double ** matrix2);
 
+//將矩陣對應的值做相減
+double** SubMatrix(int x, int y, double **matrix1, double ** matrix2);
+
 //將矩陣每一個值都乘上一個純量
 void** MulMatrixValue(int x, int y, double **matrix, int value);
 
@@ -42,6 +45,11 @@ double** MultiplyMatrix(int x, int y, int z, double **matrix1, double ** matrix2
 //將矩陣每一個值都除上一個純量
 void** DivMatrixValue(int x, int y, double **matrix, int value);
 
+//將矩陣對應的值做相除
+double** DivMatrix(int x, int y, double **matrix1, double ** matrix2);
+
+//將矩陣置換
+double** TransposeMatrix(int x, int y, double** matrix);
 //取得隨機長度為sliceNums的Maxtrix
 double** GetSliceMatrixByOrder(int x, int y, double **matrix, int sliceNums, int *order);
 #endif

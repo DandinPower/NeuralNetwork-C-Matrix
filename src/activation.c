@@ -25,9 +25,9 @@ double** dSigmoid(int x, int y, double **matrix){
 //以第1維為基底做softmax
 double** softmax(int x, int y, double **matrix){
     double** expElement = AllocateNewMatrix(x, y);
+    double tempMax = MaxMatrix(x, y, matrix, -1);
     //每一維各自的答案
     for (int i=0; i<x; i++){
-        double tempMax = MaxMatrix(x, y, matrix, -1);
         for (int j=0; j<y; j++){
             expElement[i][j] = exp(matrix[i][j] - tempMax);
         }

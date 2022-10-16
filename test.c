@@ -22,6 +22,8 @@ int main(void){
     test[1][0] = 3.1;
     test[1][1] = 1;
     test[1][2] = -3.11;
+    double** t = TransposeMatrix(2,3,test);
+    ShowMatrix(3,2,t);
 
     return 0;
 }

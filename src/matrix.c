@@ -39,7 +39,7 @@ void SetMatrixZero(int x, int y, double **matrix){
 //印出Matrix的值
 void ShowMatrix(int x, int y, double **weights){
     for(int i=0; i<x; i++) {
-        for (int j=0; j<y; j++) printf("%f,", weights[i][j]);
+        for (int j=0; j<y; j++) printf("%E,", weights[i][j]);
         printf("\n");
     }
 }
@@ -94,6 +94,13 @@ double** AddMatrix(int x, int y, double **matrix1, double ** matrix2){
     return addResult;
 }
 
+//將矩陣對應的值做相減
+double** SubMatrix(int x, int y, double **matrix1, double ** matrix2){
+    double **subResult = AllocateNewMatrix(x, y);
+    for(int i=0; i<x; i++) for(int j=0; j<y; j++) subResult[i][j] = matrix1[i][j] - matrix2[i][j];
+    return subResult;
+}
+
 //將矩陣每一個值都乘上一個純量
 void** MulMatrixValue(int x, int y, double **matrix, int value){
     for(int i=0; i<x; i++) for(int j=0; j<y; j++) matrix[i][j] *= value;
@@ -122,6 +129,20 @@ double** MultiplyMatrix(int x, int y, int z, double **matrix1, double ** matrix2
 //將矩陣每一個值都除上一個純量
 void** DivMatrixValue(int x, int y, double **matrix, int value){
     for(int i=0; i<x; i++) for(int j=0; j<y; j++) matrix[i][j] /= value;
+}
+
+//將矩陣對應的值做相除
+double** DivMatrix(int x, int y, double **matrix1, double ** matrix2){
+    double **divResult = AllocateNewMatrix(x, y);
+    for(int i=0; i<x; i++) for(int j=0; j<y; j++) divResult[i][j] = matrix1[i][j] / matrix2[i][j];
+    return divResult;
+}
+
+//將矩陣置換
+double** TransposeMatrix(int x, int y, double** matrix){
+    double** result = AllocateNewMatrix(y, x);
+    for (int i=0; i<y; i++) for (int j=0; j<x; j++) result[i][j] = matrix[j][i];
+    return result;
 }
 
 //取得隨機長度為sliceNums的Maxtrix

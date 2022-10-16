@@ -25,6 +25,6 @@ void SetZeroVector(int x, double *vector){
 
 //印出vector的值
 void ShowVector(int x, double *vector){
-    for(int i=0; i<x; i++) printf("%f,", vector[i]);
+    for(int i=0; i<x; i++) printf("%E,", vector[i]);
     printf("\n");
 }

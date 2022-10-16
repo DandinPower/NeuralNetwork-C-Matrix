@@ -17,17 +17,19 @@
 
 #define TRAIN_DATA_SIZE 60000
 #define CLASS_NUMS 10
-#define BATCH_SIZE 100
+#define BATCH_SIZE 256
 
 #define IMAGE_NORMALIZE 255
 
 double** layer_1;
 double** layer_2;
+double** updateLayer1;
+double** updateLayer2;
 
 
 //讀取資料集的Y
 double** ReadMnistLabel(){
-    double **yTrain = AllocateNewMatrix(TRAIN_DATA_SIZE, CLASS_NUMS);
+    double** yTrain = AllocateNewMatrix(TRAIN_DATA_SIZE, CLASS_NUMS);
     FILE *fp;
     char str[LABEL_N + 1];
     if ( (fp = fopen("dataset/label.txt", "rt")) == NULL ) {
@@ -55,8 +57,8 @@ double** ReadMnistLabel(){
 }
 
 //讀取資料集的X
-double ** ReadMnistImage(){
-    double **xTrain = AllocateNewMatrix(TRAIN_DATA_SIZE, INPUT_DIMENSIONS);
+double** ReadMnistImage(){
+    double** xTrain = AllocateNewMatrix(TRAIN_DATA_SIZE, INPUT_DIMENSIONS);
     FILE *fp;
     char str[IMAGE_N + 1];
     if ( (fp = fopen("dataset/minist.txt", "rt")) == NULL ) {
@@ -84,12 +86,39 @@ double ** ReadMnistImage(){
 }
 
 //Mnist的forward & backward passing
-void ForwardBackwardPass(double **x, double **y){
-    double **xLayer1 = MultiplyMatrix(BATCH_SIZE, INPUT_DIMENSIONS, LAYER1_UNITS, x, layer_1);
-    //double **xSigmoid = sigmoid(BATCH_SIZE, LAYER1_UNITS, xLayer1);
-    ShowMatrix(BATCH_SIZE, LAYER1_UNITS, xLayer1);
-    double **xSigmoid = sigmoid(BATCH_SIZE, LAYER1_UNITS, xLayer1);
-    ShowMatrix(BATCH_SIZE, LAYER1_UNITS, xSigmoid);
+double** ForwardBackwardPass(double **x, double **y){
+    double** xLayer1 = MultiplyMatrix(BATCH_SIZE, INPUT_DIMENSIONS, LAYER1_UNITS, x, layer_1);
+    double** xSigmoid = sigmoid(BATCH_SIZE, LAYER1_UNITS, xLayer1);
+    double** xLayer2 = MultiplyMatrix(BATCH_SIZE, LAYER1_UNITS, LAYER2_UNITS, xSigmoid, layer_2);
+    double** out = softmax(BATCH_SIZE, LAYER2_UNITS, xLayer2);
+    double** tempError = SubMatrix(BATCH_SIZE, LAYER2_UNITS, out, y);
+    MulMatrixValue(BATCH_SIZE, LAYER2_UNITS, tempError, 2);
+    DivMatrixValue(BATCH_SIZE, LAYER2_UNITS, tempError,LAYER1_UNITS);
+    double** dSoftmaxXLayer2 = dSoftmax(BATCH_SIZE, LAYER2_UNITS, xLayer2);
+    double** tempError2 = HadamardProductMatrix(BATCH_SIZE, LAYER2_UNITS, tempError, dSoftmaxXLayer2);
+    double** xSigmoidT = TransposeMatrix(BATCH_SIZE, LAYER1_UNITS, xSigmoid);
+    updateLayer2 = MultiplyMatrix(LAYER1_UNITS, BATCH_SIZE, LAYER2_UNITS, xSigmoidT, tempError2);
+    double** errorT = TransposeMatrix(BATCH_SIZE, LAYER2_UNITS, tempError2);
+    double** tempError3 = MultiplyMatrix(LAYER1_UNITS, LAYER2_UNITS, BATCH_SIZE, layer_2, errorT);
+    double** error3T = TransposeMatrix(LAYER1_UNITS, BATCH_SIZE, tempError3);
+    double** dSigmoidXLayer1 = dSigmoid(BATCH_SIZE, LAYER1_UNITS, xLayer1);
+    double** tempError4 = HadamardProductMatrix(BATCH_SIZE, LAYER1_UNITS, error3T, dSigmoidXLayer1);
+    double** xT = TransposeMatrix(BATCH_SIZE, INPUT_DIMENSIONS, x);
+    updateLayer1 = MultiplyMatrix(INPUT_DIMENSIONS, BATCH_SIZE, LAYER1_UNITS, xT, tempError4);
+    FreeMatrix(xLayer1);
+    FreeMatrix(xSigmoid);
+    FreeMatrix(xLayer2);
+    FreeMatrix(tempError);
+    FreeMatrix(dSoftmaxXLayer2);
+    FreeMatrix(tempError2);
+    FreeMatrix(xSigmoidT);
+    FreeMatrix(errorT);
+    FreeMatrix(tempError3);
+    FreeMatrix(error3T);
+    FreeMatrix(dSigmoidXLayer1);
+    FreeMatrix(tempError4);
+    FreeMatrix(xT);
+    return out;
 }
 
 int main(void){
@@ -98,11 +127,13 @@ int main(void){
     layer_2 = InitWeightMatrix(LAYER1_UNITS, LAYER2_UNITS);
     double** yTrain = ReadMnistLabel();
     double** xTrain = ReadMnistImage();
-    DivMatrixValue(TRAIN_DATA_SIZE, INPUT_DIMENSIONS, xTrain, IMAGE_NORMALIZE);
+    //DivMatrixValue(TRAIN_DATA_SIZE, INPUT_DIMENSIONS, xTrain, IMAGE_NORMALIZE);
     int* order = GetShuffleOrder(TRAIN_DATA_SIZE); 
     double** yTrainSlice = GetSliceMatrixByOrder(TRAIN_DATA_SIZE, CLASS_NUMS, yTrain, BATCH_SIZE, order);
     double** xTrainSlice = GetSliceMatrixByOrder(TRAIN_DATA_SIZE, INPUT_DIMENSIONS, xTrain, BATCH_SIZE, order);
     free(order);
-    ForwardBackwardPass(xTrainSlice, yTrainSlice);
+    double** out = ForwardBackwardPass(xTrainSlice, yTrainSlice);
+    FreeMatrix(yTrainSlice);
+    FreeMatrix(xTrainSlice);
     return 0;
 }

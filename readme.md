@@ -28,6 +28,8 @@ A Simple DNN Implementation from scratch in c. Using Matrix and Vector to create
     sudo apt install make
 
     # download dataset
+    sudo apt install wget
+    chmod +x download.sh
     ./download.sh
     ```
     

@@ -26,6 +26,9 @@ A Simple DNN Implementation from scratch in c. Using Matrix and Vector to create
     # install gcc
     sudo apt install build-essential
     sudo apt install make
+
+    # download dataset
+    ./download.sh
     ```
     
 

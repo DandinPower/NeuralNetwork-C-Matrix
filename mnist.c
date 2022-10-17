@@ -37,7 +37,7 @@ double** ReadMnistLabel(){
     double** yTrain = AllocateNewMatrix(TRAIN_DATA_SIZE, CLASS_NUMS);
     FILE *fp;
     char str[LABEL_N + 1];
-    if ( (fp = fopen("dataset/label.txt", "rt")) == NULL ) {
+    if ( (fp = fopen("dataset/mnist.labels", "rt")) == NULL ) {
         puts("Fail to open file!");
         exit(0);
     }
@@ -66,7 +66,7 @@ double** ReadMnistImage(){
     double** xTrain = AllocateNewMatrix(TRAIN_DATA_SIZE, INPUT_DIMENSIONS);
     FILE *fp;
     char str[IMAGE_N + 1];
-    if ( (fp = fopen("dataset/minist.txt", "rt")) == NULL ) {
+    if ( (fp = fopen("dataset/mnist.images", "rt")) == NULL ) {
         puts("Fail to open file!");
         exit(0);
     }
@@ -211,6 +211,6 @@ void Inference(){
 
 int main(void){
     //Train();
-    //Inference();
+    Inference();
     return 0;
 }

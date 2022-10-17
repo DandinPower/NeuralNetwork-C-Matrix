@@ -210,7 +210,7 @@ void Inference(){
 
 
 int main(void){
-    //Train();
+    Train();
     Inference();
     return 0;
 }
